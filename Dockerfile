@@ -31,8 +31,14 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Allow .htaccess overrides
-RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+# Allow .htaccess overrides everywhere
+RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+
+# Add FallbackResource so all routes go to index.php (backup for .htaccess)
+RUN echo '<Directory /var/www/html/public>\n\
+    AllowOverride All\n\
+    FallbackResource /index.php\n\
+</Directory>' >> /etc/apache2/apache2.conf
 
 # ---- PHP production configuration ----
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
