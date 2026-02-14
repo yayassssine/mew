@@ -10,14 +10,10 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     libicu-dev \
-    libpq-dev \
     libzip-dev \
     zip \
     && docker-php-ext-install \
     intl \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
     zip \
     opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*

@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Repository\MemoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,9 +15,35 @@ class MainController extends AbstractController
     }
 
     #[Route('/our-story', name: 'app_our_story')]
-    public function ourStory(MemoryRepository $memoryRepository): Response
+    public function ourStory(): Response
     {
-        $memories = $memoryRepository->findAllSortedByDate();
+        $memories = [
+            [
+                'title' => 'The First Message',
+                'description' => "The day a simple message changed everything.\nSeptember 9, 2024 — the beginning of something neither of us expected,\nbut both of us were meant to find.",
+                'date' => 'September 9, 2024',
+            ],
+            [
+                'title' => 'The First Time I Saw You',
+                'description' => "I don't remember the exact day.\nMaybe it was September.\nMaybe it was November.\nBut I remember the feeling.\nAnd that is what truly mattered.",
+                'date' => 'September 20, 2024',
+            ],
+            [
+                'title' => 'The Day I Came for You',
+                'description' => "The day I walked into your home not just as a man in love,\nbut as a man certain.\nOctober 11, 2025 — the day our future became real.",
+                'date' => 'October 11, 2025',
+            ],
+            [
+                'title' => 'The Day We Became One',
+                'description' => "February 4, 2026 —\nThe day love became written.\nNot just in our hearts,\nbut officially in this world.",
+                'date' => 'February 4, 2026',
+            ],
+            [
+                'title' => 'Our Wedding Day',
+                'description' => "April 11, 2026 —\nThe day we celebrate love,\nfamily,\nand the life we chose together.",
+                'date' => 'April 11, 2026',
+            ],
+        ];
 
         return $this->render('pages/our_story.html.twig', [
             'memories' => $memories,

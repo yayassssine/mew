@@ -19,21 +19,6 @@ echo "Warming up cache..."
 php bin/console cache:clear --env=prod --no-debug 2>&1 || true
 php bin/console cache:warmup --env=prod --no-debug 2>&1 || true
 
-# ---- Debug: show DATABASE_URL status ----
-if [ -z "$DATABASE_URL" ]; then
-    echo "WARNING: DATABASE_URL is NOT set! Database features will not work."
-else
-    echo "DATABASE_URL is set (starts with: ${DATABASE_URL:0:20}...)"
-fi
-
-# ---- Create database schema ----
-echo "Setting up database schema..."
-php bin/console doctrine:schema:update --force --no-interaction 2>&1 || echo "Schema update failed — check DATABASE_URL"
-
-# ---- Seed memories if table is empty ----
-echo "Checking for seed data..."
-php bin/console app:seed-memories 2>&1 || echo "Seed failed — check database connection"
-
 echo "Forever Valentine is ready!"
 
 # ---- Start Apache ----

@@ -31,7 +31,7 @@
                     <div class="timeline-card {% if loop.last %}wedding-card{% endif %}">
                         <div class="timeline-date">
                             <i class="bi bi-calendar-heart me-2"></i>
-                            {{ memory.date|date('F j, Y') }}
+                            {{ memory.date }}
                         </div>
                         <h3 class="timeline-title">{{ memory.title }}</h3>
                         <p class="timeline-description">{{ memory.description|nl2br }}</p>
