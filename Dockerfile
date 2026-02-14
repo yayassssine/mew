@@ -53,15 +53,21 @@ WORKDIR /var/www/html
 # ---- Copy composer files first (for Docker cache) ----
 COPY composer.json composer.lock ./
 
-# ---- Install dependencies (no dev) ----
+# ---- Set production environment BEFORE anything else ----
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
 ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# ---- Install dependencies (no dev) ----
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 # ---- Copy the rest of the project ----
 COPY . .
 
+# ---- Override .env to force production ----
+RUN echo "APP_ENV=prod" > .env.local
+
 # ---- Run Symfony post-install scripts ----
-ENV APP_ENV=prod
 RUN composer run-script post-install-cmd --no-interaction || true
 
 # ---- Set permissions ----
