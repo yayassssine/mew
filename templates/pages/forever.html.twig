@@ -1,0 +1,435 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forever{% endblock %}
+
+{% block stylesheets %}
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+{# ===== Audio Elements ===== #}
+<audio id="bgMusic" preload="metadata" loop>
+    <source src="/audio/romantic.mp3" type="audio/mpeg">
+</audio>
+<audio id="poemAudio" preload="metadata">
+    <source src="/audio/poem-reading.mp3" type="audio/mpeg">
+</audio>
+
+{# ===== Question Section ===== #}
+<section class="page-section forever-section d-flex align-items-center justify-content-center min-vh-100" id="question-section" style="position:relative; overflow:hidden;">
+    <div class="container text-center">
+        <div class="fade-in-up">
+            {# Dramatic hearts #}
+            <div class="dramatic-hearts mb-4">
+                <i class="bi bi-heart-fill dramatic-heart dh-1"></i>
+                <i class="bi bi-heart-fill dramatic-heart dh-2"></i>
+                <i class="bi bi-heart-fill dramatic-heart dh-3"></i>
+                <i class="bi bi-heart-fill dramatic-heart dh-4"></i>
+                <i class="bi bi-heart-fill dramatic-heart dh-5"></i>
+            </div>
+
+            <h1 class="forever-title script-font">Will you stay my Valentine forever?</h1>
+
+            <div class="elegant-divider my-4">
+                <span class="divider-line"></span>
+                <i class="bi bi-heart-fill divider-heart"></i>
+                <span class="divider-line"></span>
+            </div>
+
+            <div class="buttons-container mt-5">
+                <button class="btn btn-yes btn-lg me-4" id="btn-yes">
+                    <i class="bi bi-heart-fill me-2"></i>YES <i class="bi bi-heart-fill ms-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {# NO button lives directly inside the section so absolute positioning is relative to it #}
+    <div class="no-btn-wrapper" id="no-btn-wrapper">
+        <button class="btn btn-no btn-lg" id="btn-no">
+            NO
+        </button>
+        <span class="nice-try" id="nice-try">Nice try 😌</span>
+    </div>
+</section>
+
+{# ===== Celebration Section (hidden initially) ===== #}
+<section class="celebration-section d-none" id="celebration-section">
+    <div class="celebration-bg"></div>
+    <div class="floating-hearts-bg" id="floating-hearts-bg"></div>
+
+    <div class="container text-center celebration-content">
+        <div class="celebration-card">
+            <div class="celebration-icon mb-4">
+                <i class="bi bi-heart-fill celebration-heart ch-1"></i>
+                <i class="bi bi-heart-fill celebration-heart ch-2"></i>
+                <i class="bi bi-heart-fill celebration-heart ch-3"></i>
+            </div>
+
+            <h1 class="celebration-title script-font">Congratulations.</h1>
+
+            <div class="celebration-message mt-4">
+                <p class="celebration-line line-1">You just signed a lifetime contract</p>
+                <p class="celebration-line line-2">with <strong>Yassine </strong></p>
+                <div class="elegant-divider my-4">
+                    <span class="divider-line gold"></span>
+                    <i class="bi bi-heart-fill divider-heart gold"></i>
+                    <span class="divider-line gold"></span>
+                </div>
+                <p class="celebration-terms line-3">No cancellations. No refunds. Only love.</p>
+            </div>
+
+            <div class="celebration-rings mt-4 line-4">
+                <span class="ring ring-left">💍</span>
+                <i class="bi bi-heart-fill ring-heart"></i>
+                <span class="ring ring-right">💍</span>
+            </div>
+
+            <div class="mt-5 line-5">
+                <a href="{{ path('app_home') }}" class="btn btn-valentine-gold btn-lg">
+                    <i class="bi bi-arrow-repeat me-2"></i>Relive Our Story
+                </a>
+            </div>
+
+            {# Hidden Poem Trigger #}
+            <div class="mt-4 line-6 poem-trigger-wrapper">
+                <span class="poem-trigger" id="poem-trigger">
+                    رسالة خاصة
+                </span>
+            </div>
+        </div>
+
+        {# Hidden Poem Section #}
+        <div class="poem-section d-none" id="poem-section">
+            <div class="poem-card" dir="rtl" lang="ar">
+                <div class="poem-header">
+                    <div class="elegant-divider mb-3">
+                        <span class="divider-line gold"></span>
+                        <i class="bi bi-heart-fill divider-heart gold"></i>
+                        <span class="divider-line gold"></span>
+                    </div>
+                    <p class="poem-attribution">نزار قباني</p>
+                </div>
+                <div class="poem-body">
+                    <p class="poem-line">أحبكِ جداً</p>
+                    <p class="poem-line">وأعرف أن الطريق إلى المستحيل طويل</p>
+                    <p class="poem-line">وأعرف أنكِ ست النساء</p>
+                    <p class="poem-line">وليس لدي بديل</p>
+                    <p class="poem-line">وأعرف أن زمان الحنين انتهى</p>
+                    <p class="poem-line">ومات الكلام الجميل</p>
+                    <p class="poem-line poem-line-final">لكنني أحبكِ جداً</p>
+                </div>
+                <div class="poem-footer mt-3">
+                    <i class="bi bi-heart-fill" style="color: var(--gold); font-size: 0.8rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Canvas for confetti #}
+<canvas id="confetti-canvas"></canvas>
+{% endblock %}
+
+{% block javascripts %}
+<script src="/js/confetti.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    // =============================================
+    // Audio references
+    // =============================================
+    const bgMusic   = document.getElementById('bgMusic');
+    const poemAudio = document.getElementById('poemAudio');
+
+    // =============================================
+    // NO Button — Trapped inside section, can NEVER leave
+    // =============================================
+    let escapeCount  = 0;
+    let escapeReady  = true;
+
+    const section    = document.getElementById('question-section');
+    const btnNo      = document.getElementById('btn-no');
+    const noWrapper  = document.getElementById('no-btn-wrapper');
+    const niceTry    = document.getElementById('nice-try');
+
+    const messages = [
+        'Nice try 😌',
+        'Not happening 😏',
+        'Really? 🤨',
+        'Just say YES! 💕',
+        'You cannot escape love 💖',
+        'I will keep running 🏃‍♂️',
+        'The answer is YES 😍',
+        'Stop trying 😘',
+        'Love always wins ❤️',
+        'Just click YES already! 💍'
+    ];
+
+    function escapeButton() {
+        if (!escapeReady) return;
+        escapeReady = false;
+        setTimeout(function () { escapeReady = true; }, 700);
+
+        escapeCount++;
+
+        // The section is position:relative; overflow:hidden
+        // The wrapper is position:absolute INSIDE the section
+        // So it physically cannot leave the section — ever.
+        var sectionW = section.offsetWidth;
+        var sectionH = section.offsetHeight;
+
+        // Measure the wrapper (button + "nice try" text)
+        var wrapW = noWrapper.offsetWidth  || 150;
+        var wrapH = noWrapper.offsetHeight || 90;
+
+        // Padding from edges so it's never cut off
+        var pad = 15;
+
+        // Maximum positions (relative to the section, not the viewport)
+        var maxX = sectionW - wrapW - pad;
+        var maxY = sectionH - wrapH - pad;
+
+        // Clamp minimums
+        if (maxX < pad) maxX = pad;
+        if (maxY < pad) maxY = pad;
+
+        var randomX = Math.floor(Math.random() * (maxX - pad)) + pad;
+        var randomY = Math.floor(Math.random() * (maxY - pad)) + pad;
+
+        // Position absolutely within the section
+        noWrapper.style.position   = 'absolute';
+        noWrapper.style.left       = randomX + 'px';
+        noWrapper.style.top        = randomY + 'px';
+        noWrapper.style.bottom     = 'auto';
+        noWrapper.style.transform  = 'none';
+        noWrapper.style.transition = 'left 0.5s ease, top 0.5s ease';
+        noWrapper.style.zIndex     = '50';
+
+        // Show message — stays visible until the NEXT escape move
+        niceTry.textContent = messages[escapeCount % messages.length];
+        niceTry.classList.add('visible');
+
+        // Gently shrink (minimum 70%)
+        var scale = Math.max(0.7, 1 - escapeCount * 0.03);
+        btnNo.style.transition = 'transform 0.4s ease';
+        btnNo.style.transform  = 'scale(' + scale + ')';
+    }
+
+    // Re-clamp on resize so it stays visible
+    window.addEventListener('resize', function () {
+        if (noWrapper.style.position !== 'absolute') return;
+        var sW = section.offsetWidth;
+        var sH = section.offsetHeight;
+        var wW = noWrapper.offsetWidth  || 150;
+        var wH = noWrapper.offsetHeight || 90;
+        var curX = parseInt(noWrapper.style.left, 10) || 0;
+        var curY = parseInt(noWrapper.style.top, 10)  || 0;
+        noWrapper.style.left = Math.max(15, Math.min(curX, sW - wW - 15)) + 'px';
+        noWrapper.style.top  = Math.max(15, Math.min(curY, sH - wH - 15)) + 'px';
+    });
+
+    btnNo.addEventListener('mouseenter', escapeButton);
+    btnNo.addEventListener('click',      escapeButton);
+
+    // =============================================
+    // YES Button — Celebration + Background Music
+    // =============================================
+    document.getElementById('btn-yes').addEventListener('click', function () {
+        var questionSection     = document.getElementById('question-section');
+        var celebrationSection  = document.getElementById('celebration-section');
+
+        // Fade out question
+        questionSection.style.opacity    = '0';
+        questionSection.style.transition = 'opacity 0.8s ease';
+
+        setTimeout(function () {
+            questionSection.classList.add('d-none');
+            celebrationSection.classList.remove('d-none');
+
+            // Visual effects
+            startConfetti();
+            startFloatingHearts();
+            animateCelebration();
+
+            // Start romantic piano music (triggered by click → autoplay policy OK)
+            bgMusic.volume = 0.25;
+            bgMusic.play().catch(function (e) {
+                console.log('Background music could not play:', e);
+            });
+        }, 800);
+    });
+
+    // =============================================
+    // Poem — Stop music, play reading, reveal text
+    // =============================================
+    var poemOpen = false;
+
+    document.getElementById('poem-trigger').addEventListener('click', function () {
+        var poemSection = document.getElementById('poem-section');
+        var trigger     = document.getElementById('poem-trigger');
+
+        if (!poemOpen) {
+            // ---- Open poem ----
+            poemOpen = true;
+
+            // Fade out background music over 0.8 s, then pause
+            fadeOutAudio(bgMusic, 800);
+
+            // Show poem card
+            poemSection.classList.remove('d-none');
+            void poemSection.offsetWidth;          // force reflow
+            poemSection.classList.add('poem-visible');
+            trigger.textContent = '✕ إغلاق';
+
+            // Stagger poem lines
+            var lines = poemSection.querySelectorAll('.poem-line');
+            lines.forEach(function (line, i) {
+                setTimeout(function () { line.classList.add('visible'); }, 300 + i * 350);
+            });
+
+            // Start poem reading audio with fade-in
+            setTimeout(function () {
+                poemAudio.volume = 0;
+                poemAudio.currentTime = 0;
+                poemAudio.play().then(function () {
+                    fadeInAudio(poemAudio, 0.35, 1200);
+                }).catch(function (e) {
+                    console.log('Poem audio could not play:', e);
+                });
+            }, 500);
+
+            // Scroll to poem
+            setTimeout(function () {
+                poemSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+
+        } else {
+            // ---- Close poem ----
+            poemOpen = false;
+
+            // Fade out poem reading
+            fadeOutAudio(poemAudio, 600);
+
+            // Hide poem card
+            poemSection.classList.remove('poem-visible');
+            setTimeout(function () {
+                poemSection.classList.add('d-none');
+                poemSection.querySelectorAll('.poem-line').forEach(function (l) {
+                    l.classList.remove('visible');
+                });
+            }, 500);
+
+            trigger.textContent = 'رسالة خاصة';
+
+            // Resume background music with fade-in
+            setTimeout(function () {
+                bgMusic.volume = 0;
+                bgMusic.play().then(function () {
+                    fadeInAudio(bgMusic, 0.25, 1500);
+                }).catch(function (e) {
+                    console.log('Background music could not resume:', e);
+                });
+            }, 700);
+        }
+    });
+
+    // =============================================
+    // Audio fade helpers
+    // =============================================
+    function fadeOutAudio(audio, durationMs) {
+        var startVol = audio.volume;
+        var steps    = 20;
+        var interval = durationMs / steps;
+        var delta    = startVol / steps;
+        var step     = 0;
+
+        var timer = setInterval(function () {
+            step++;
+            var newVol = startVol - delta * step;
+            audio.volume = Math.max(0, newVol);
+            if (step >= steps) {
+                clearInterval(timer);
+                audio.pause();
+                audio.volume = startVol; // restore for next play
+            }
+        }, interval);
+    }
+
+    function fadeInAudio(audio, targetVol, durationMs) {
+        var steps    = 20;
+        var interval = durationMs / steps;
+        var delta    = targetVol / steps;
+        var step     = 0;
+
+        audio.volume = 0;
+        var timer = setInterval(function () {
+            step++;
+            var newVol = delta * step;
+            audio.volume = Math.min(targetVol, newVol);
+            if (step >= steps) {
+                clearInterval(timer);
+                audio.volume = targetVol;
+            }
+        }, interval);
+    }
+
+    // =============================================
+    // Confetti
+    // =============================================
+    function startConfetti() {
+        var canvas = document.getElementById('confetti-canvas');
+        canvas.style.display = 'block';
+        launchConfetti(canvas);
+    }
+
+    // =============================================
+    // Floating Hearts
+    // =============================================
+    function startFloatingHearts() {
+        var container = document.getElementById('floating-hearts-bg');
+        setInterval(function () { createFloatingHeart(container); }, 300);
+        for (var i = 0; i < 20; i++) {
+            (function (idx) {
+                setTimeout(function () { createFloatingHeart(container); }, idx * 100);
+            })(i);
+        }
+    }
+
+    function createFloatingHeart(container) {
+        var emojis = ['❤️', '💕', '💖', '💗', '💝', '💘', '🤍', '💍'];
+        var heart  = document.createElement('div');
+        heart.className = 'floating-celebration-heart';
+        heart.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+        heart.style.left              = Math.random() * 100 + '%';
+        heart.style.animationDuration = (Math.random() * 4 + 4) + 's';
+        heart.style.fontSize          = (Math.random() * 20 + 14) + 'px';
+        heart.style.opacity           = Math.random() * 0.6 + 0.4;
+        container.appendChild(heart);
+        setTimeout(function () { heart.remove(); }, 8000);
+    }
+
+    // =============================================
+    // Celebration Animation
+    // =============================================
+    function animateCelebration() {
+        var lines = document.querySelectorAll(
+            '.celebration-card .celebration-line,' +
+            '.celebration-card .celebration-terms,' +
+            '.celebration-card .celebration-rings,' +
+            '.celebration-card .line-5,' +
+            '.celebration-card .line-6'
+        );
+        lines.forEach(function (line, i) {
+            setTimeout(function () { line.classList.add('visible'); }, 500 + i * 600);
+        });
+
+        setTimeout(function () {
+            document.querySelector('.celebration-title').classList.add('visible');
+        }, 200);
+    }
+
+})();
+</script>
+{% endblock %}

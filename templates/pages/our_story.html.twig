@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Our Story{% endblock %}
+
+{% block body %}
+<section class="page-section story-section pt-5">
+    <div class="container">
+        {# Page Header #}
+        <div class="text-center mb-5 pt-5 fade-in-up">
+            <h1 class="page-title script-font">Our Story</h1>
+            <p class="page-subtitle">Every moment with you is a chapter I never want to end.</p>
+            <div class="elegant-divider my-4">
+                <span class="divider-line"></span>
+                <i class="bi bi-heart-fill divider-heart"></i>
+                <span class="divider-line"></span>
+            </div>
+        </div>
+
+        {# Timeline #}
+        <div class="timeline">
+            {% for memory in memories %}
+            <div class="timeline-item scroll-reveal {{ loop.index is odd ? 'left' : 'right' }}">
+                <div class="timeline-dot">
+                    {% if loop.last %}
+                        <i class="bi bi-gem"></i>
+                    {% else %}
+                        <i class="bi bi-heart-fill"></i>
+                    {% endif %}
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-card {% if loop.last %}wedding-card{% endif %}">
+                        <div class="timeline-date">
+                            <i class="bi bi-calendar-heart me-2"></i>
+                            {{ memory.date|date('F j, Y') }}
+                        </div>
+                        <h3 class="timeline-title">{{ memory.title }}</h3>
+                        <p class="timeline-description">{{ memory.description|nl2br }}</p>
+
+                        {% if loop.last %}
+                        {# Wedding Countdown #}
+                        <div class="wedding-countdown mt-3" id="wedding-countdown">
+                            <p class="countdown-label"><i class="bi bi-hourglass-split me-1"></i> Counting down to our celebration</p>
+                            <div class="countdown-timer">
+                                <div class="countdown-unit">
+                                    <span class="countdown-number" id="cd-days">--</span>
+                                    <span class="countdown-text">Days</span>
+                                </div>
+                                <div class="countdown-separator">:</div>
+                                <div class="countdown-unit">
+                                    <span class="countdown-number" id="cd-hours">--</span>
+                                    <span class="countdown-text">Hours</span>
+                                </div>
+                                <div class="countdown-separator">:</div>
+                                <div class="countdown-unit">
+                                    <span class="countdown-number" id="cd-minutes">--</span>
+                                    <span class="countdown-text">Minutes</span>
+                                </div>
+                                <div class="countdown-separator">:</div>
+                                <div class="countdown-unit">
+                                    <span class="countdown-number" id="cd-seconds">--</span>
+                                    <span class="countdown-text">Seconds</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="timeline-footer">
+                            <i class="bi bi-heart-fill me-1"></i>
+                            <i class="bi bi-heart-fill me-1"></i>
+                            <i class="bi bi-heart-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <p class="empty-message">Our story is just beginning... memories are being written.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {# Bottom CTA #}
+        <div class="text-center mt-5 pb-5 fade-in-up">
+            <p class="cta-text">And the story continues...</p>
+            <a href="{{ path('app_why_you') }}" class="btn btn-valentine">
+                <i class="bi bi-arrow-right-circle me-2"></i>Discover Why You
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function() {
+    const weddingDate = new Date('2026-04-11T00:00:00').getTime();
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const diff = weddingDate - now;
+
+        if (diff <= 0) {
+            document.getElementById('wedding-countdown').innerHTML =
+                '<p class="countdown-label" style="font-size:1.1rem;">💍 Today is the day! 💍</p>';
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        const daysEl = document.getElementById('cd-days');
+        const hoursEl = document.getElementById('cd-hours');
+        const minutesEl = document.getElementById('cd-minutes');
+        const secondsEl = document.getElementById('cd-seconds');
+
+        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+})();
+</script>
+{% endblock %}

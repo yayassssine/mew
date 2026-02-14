@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+<section class="hero-section d-flex align-items-center justify-content-center min-vh-100">
+    <div class="container text-center">
+        <div class="hero-content fade-in-up">
+            {# Decorative top element #}
+            <div class="decorative-hearts mb-4">
+                <i class="bi bi-heart-fill floating-heart delay-1"></i>
+                <i class="bi bi-heart-fill floating-heart delay-2"></i>
+                <i class="bi bi-heart-fill floating-heart delay-3"></i>
+            </div>
+
+            {# Main romantic message with typewriter effect #}
+            <div class="typewriter-container">
+                <h1 class="hero-title" id="typewriter-text"></h1>
+            </div>
+
+            {# Animated subtitle #}
+            <div class="subtitle-container mt-5">
+                <p class="hero-subtitle fade-in-delayed" id="hero-subtitle">
+                    And this is ours.
+                </p>
+            </div>
+
+            {# Decorative divider #}
+            <div class="elegant-divider my-4">
+                <span class="divider-line"></span>
+                <i class="bi bi-heart-fill divider-heart"></i>
+                <span class="divider-line"></span>
+            </div>
+
+            {# Enter button #}
+            <div class="mt-5 fade-in-delayed-more">
+                <a href="{{ path('app_our_story') }}" class="btn btn-valentine btn-lg">
+                    <i class="bi bi-door-open me-2"></i>Enter Our Story
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {# Scroll indicator #}
+    <div class="scroll-indicator">
+        <div class="scroll-arrow">
+            <i class="bi bi-chevron-double-down"></i>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Typewriter effect for the main message
+    const text = "Not everything beautiful needs proof.\nSome things are simply real.\nThe most beautiful chapters of our story\nare written in moments only we remember.";
+    const element = document.getElementById('typewriter-text');
+    let index = 0;
+    const speed = 45;
+
+    function typeWriter() {
+        if (index < text.length) {
+            const char = text.charAt(index);
+            if (char === '\n') {
+                element.innerHTML += '<br>';
+            } else {
+                element.innerHTML += char;
+            }
+            index++;
+            setTimeout(typeWriter, speed);
+        } else {
+            // Show subtitle after typewriter finishes
+            document.getElementById('hero-subtitle').classList.add('visible');
+            // Show the rest of the content
+            document.querySelectorAll('.fade-in-delayed-more').forEach(el => {
+                el.classList.add('visible');
+            });
+        }
+    }
+
+    // Start typewriter after a small delay
+    setTimeout(typeWriter, 800);
+});
+</script>
+{% endblock %}

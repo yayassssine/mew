@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Why You{% endblock %}
+
+{% block body %}
+<section class="page-section why-section pt-5">
+    <div class="container">
+        {# Page Header #}
+        <div class="text-center mb-5 pt-5 fade-in-up">
+            <h1 class="page-title script-font">Why You?</h1>
+            <p class="page-subtitle">Click each heart to reveal a reason my soul chose yours.</p>
+            <div class="elegant-divider my-4">
+                <span class="divider-line"></span>
+                <i class="bi bi-heart-fill divider-heart"></i>
+                <span class="divider-line"></span>
+            </div>
+        </div>
+
+        {# Hearts Grid #}
+        <div class="hearts-grid">
+            {% for reason in reasons %}
+            <div class="heart-card scroll-reveal" data-delay="{{ loop.index * 100 }}">
+                <div class="heart-flipper" onclick="revealReason(this)">
+                    <div class="heart-front">
+                        <div class="heart-icon-wrapper">
+                            <i class="bi bi-heart-fill heart-big"></i>
+                            <span class="heart-number">{{ loop.index }}</span>
+                        </div>
+                        <p class="heart-hint">Click to reveal</p>
+                    </div>
+                    <div class="heart-back">
+                        <div class="heart-back-content">
+                            <i class="bi bi-quote quote-icon"></i>
+                            <p class="reason-text">{{ reason }}</p>
+                            <i class="bi bi-heart-fill reason-heart"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {# Bottom CTA #}
+        <div class="text-center mt-5 pb-5 fade-in-up">
+            <p class="cta-text">And the most important question...</p>
+            <a href="{{ path('app_forever') }}" class="btn btn-valentine">
+                <i class="bi bi-infinity me-2"></i>The Final Question
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+function revealReason(element) {
+    element.classList.toggle('flipped');
+
+    // Create mini hearts explosion
+    const rect = element.getBoundingClientRect();
+    for (let i = 0; i < 8; i++) {
+        createMiniHeart(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }
+}
+
+function createMiniHeart(x, y) {
+    const heart = document.createElement('div');
+    heart.innerHTML = '<i class="bi bi-heart-fill"></i>';
+    heart.className = 'mini-heart-explosion';
+    heart.style.left = x + 'px';
+    heart.style.top = y + 'px';
+    heart.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+    heart.style.setProperty('--ty', -(Math.random() * 150 + 50) + 'px');
+    heart.style.color = ['#e91e63', '#f06292', '#f8bbd0', '#c2185b', '#d4a574'][Math.floor(Math.random() * 5)];
+    heart.style.fontSize = (Math.random() * 14 + 10) + 'px';
+    document.body.appendChild(heart);
+
+    setTimeout(() => heart.remove(), 1200);
+}
+</script>
+{% endblock %}
